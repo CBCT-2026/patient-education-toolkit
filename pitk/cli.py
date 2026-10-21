@@ -114,11 +114,11 @@ def cmd_hook(_args):
         findings = run([path], root, cfg, lang)
     except ImportError as e:
         print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PostToolUse', 'additionalContext':
-              f'patient-info-toolkit could not run ({e}). Install: pip install beautifulsoup4 textstat==0.7.3'}}))
+              f'patient-education-toolkit could not run ({e}). Install: pip install beautifulsoup4 textstat==0.7.3'}}))
         return 0
     if not findings:
         return 0
-    text = 'Patient information checks (patient-info-toolkit):\n' + report(findings, root)
+    text = 'Patient information checks (patient-education-toolkit):\n' + report(findings, root)
     if any(f.severity == 'error' for f in findings):
         print(json.dumps({'decision': 'block', 'reason': text + '\nFix the errors, or explain to the user why a rule '
                           'should be relaxed in .patient-info.json.'}, ensure_ascii=False))

@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "patient-info-toolkit"
+name = "patient-education-toolkit"
 version = "0.1.0"
 description = "Deterministic checks for patient information documents in English and Japanese, with Claude Code skills and hooks."
 readme = "README.md"

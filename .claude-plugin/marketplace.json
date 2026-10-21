@@ -1,9 +1,9 @@
 {
-  "name": "patient-info-toolkit",
+  "name": "patient-education-toolkit",
   "owner": { "name": "Markus Seifert" },
   "plugins": [
     {
-      "name": "patient-info-toolkit",
+      "name": "patient-education-toolkit",
       "source": "./",
       "description": "Skills and deterministic hooks for writing patient information in English and Japanese."
     }

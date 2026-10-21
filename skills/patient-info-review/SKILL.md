@@ -9,7 +9,7 @@ Run the steps in order. Do not skip step 1: the automatic checks are cheap and c
 
 ## 1. Automatic checks
 
-If `pitk` is not installed, install it first: `pip install git+https://github.com/CBCT-2026/patient-info-toolkit`.
+If `pitk` is not installed, install it first: `pip install git+https://github.com/CBCT-2026/patient-education-toolkit`.
 
 Run `pitk check <files>` (or with no files to check everything listed in `.patient-info.json`).
 If the project has no `.patient-info.json`, offer to create one from `examples/patient-info.json` and ask the user:

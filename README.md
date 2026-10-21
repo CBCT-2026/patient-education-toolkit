@@ -1,6 +1,6 @@
-# patient-info-toolkit
+# patient-education-toolkit
 
-Claude Code skills and deterministic hooks for writing **patient information** (leaflets, web pages, consent text, spoken scripts) in **English and Japanese**, based on current guidance: the NHS content guide, AHRQ PEMAT, the CDC Clear Communication Index, IPDAS risk communication, ISO 24495-1 plain language, and 出入国在留管理庁・文化庁「やさしい日本語ガイドライン」. Sources and how each rule maps to them: [docs/guidelines.md](docs/guidelines.md).
+Claude Code skills and deterministic hooks for writing **patient education materials** (leaflets, web pages, consent text, spoken scripts) in **English and Japanese**, based on current guidance: the NHS content guide, AHRQ PEMAT, the CDC Clear Communication Index, IPDAS risk communication, ISO 24495-1 plain language, and 出入国在留管理庁・文化庁「やさしい日本語ガイドライン」. Sources and how each rule maps to them: [docs/guidelines.md](docs/guidelines.md).
 
 It has two parts:
 
@@ -33,8 +33,8 @@ Every threshold and severity can be changed per project.
 **As a Claude Code plugin (skills + hook):**
 
 ```
-/plugin marketplace add CBCT-2026/patient-info-toolkit
-/plugin install patient-info-toolkit@patient-info-toolkit
+/plugin marketplace add CBCT-2026/patient-education-toolkit
+/plugin install patient-education-toolkit@patient-education-toolkit
 ```
 
 The hook needs Python 3.9+ with `beautifulsoup4` and `textstat==0.7.3` (`pip install -r requirements.txt`). textstat is pinned because newer versions need an extra dictionary download.
@@ -42,7 +42,7 @@ The hook needs Python 3.9+ with `beautifulsoup4` and `textstat==0.7.3` (`pip ins
 **Or as a command-line tool only:**
 
 ```
-pip install git+https://github.com/CBCT-2026/patient-info-toolkit
+pip install git+https://github.com/CBCT-2026/patient-education-toolkit
 pitk check leaflet.html
 ```
 
