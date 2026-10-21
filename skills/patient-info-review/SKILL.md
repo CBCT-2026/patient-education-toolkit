@@ -16,7 +16,7 @@ If the project has no `.patient-info.json`, offer to create one from `examples/p
 - which files are patient-facing and in which language;
 - which files are translations of each other (`pairs`);
 - whether the text should speak to the reader as "you" (NHS and CDC recommend it; `address_reader`);
-- the reading target (default: FKGL 6, 20 words per sentence; Japanese 50 characters per sentence, grade 1-6 kanji).
+- the reading target (default: FKGL 6 and SMOG 6, Flesch Reading Ease 70 or more, 20 words per sentence; jReadability 3.5 or more; Japanese 50 characters per sentence, grade 1-6 kanji).
 
 Every `error` must be fixed or explicitly accepted by the user (then add the term to `jargon_allow` or relax the rule in the config, with a note why). Warnings need judgement.
 
@@ -38,6 +38,6 @@ Say whether the material has: the evidence behind each fact, a source list, the 
 ## 4. Report, then edit
 
 Give the user one table: section, problem, rule or item it fails, suggested new wording. Keep the facts, numbers and citations unchanged unless a fact is wrong (then say so separately with the source).
-Apply edits only when the user asked for edits, or after they agree. After editing, run step 1 again and show the before and after scores (FKGL, PEMAT, CCI).
+Apply edits only when the user asked for edits, or after they agree. After editing, run step 1 again and show the before and after scores (`pitk check --scores`, PEMAT, CCI).
 
 Never claim the material is "compliant" or "approved": these tools support, not replace, testing with real readers and the organisation's own sign-off.

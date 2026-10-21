@@ -9,6 +9,8 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
+from . import readability
+
 DATA = Path(__file__).resolve().parent / 'data'
 
 
@@ -62,6 +64,7 @@ class Checker:
     def __init__(self, cfg):
         self.cfg = cfg
         self.out = []
+        self.scores = []  # (file, language, scores dict) for pitk check --scores
 
     def add(self, rule, doc, section, message, excerpt=''):
         sev = self.cfg['severity'].get(rule, 'warn')
@@ -106,7 +109,7 @@ class Checker:
         cfg = self.cfg
         for s in doc.sections:
             units = [CITE.sub('', u).strip() for u in s.units]
-            text = ' '.join(u if u[-1:] in '.?!:' else u + '.' for u in units if u)
+            text = readability.join_units(units, 'en')
             if len(text.split()) >= 10:
                 g = textstat.flesch_kincaid_grade(text)
                 if g > cfg['en_max_fkgl']:
@@ -120,6 +123,21 @@ class Checker:
                                  f'{cfg["en_max_sentence_words"]} or fewer).', sent[:90] + ('…' if len(sent) > 90 else ''))
                 self._en_unit(doc, s.title, u)
         self._en_doc(doc)
+        self._en_scores(doc)
+
+    def _en_scores(self, doc):
+        cfg = self.cfg
+        text = readability.join_units([CITE.sub('', u) for u in doc.units], 'en')
+        if len(text.split()) < 10:
+            return
+        sc = readability.en_scores(text)
+        self.scores.append((doc.path, 'en', sc))
+        if sc['smog'] is not None and sc['smog'] > cfg['en_max_smog']:
+            self.add('en-smog', doc, '(whole file)', f'SMOG grade {sc["smog"]}, above {cfg["en_max_smog"]}. '
+                     'Use fewer words of 3 or more syllables.')
+        if sc['fre'] < cfg['en_min_fre']:
+            self.add('en-fre', doc, '(whole file)', f'Flesch Reading Ease {sc["fre"]}, below {cfg["en_min_fre"]} '
+                     '(higher is easier). Use shorter sentences and shorter words.')
 
     PASSIVE_OK = {'tired', 'worried', 'interested', 'used', 'based', 'called', 'concerned', 'located', 'scared',
                   'supposed', 'pleased', 'prepared', 'involved', 'married', 'needed', 'allowed', 'red', 'bored',
@@ -236,6 +254,15 @@ class Checker:
                 self.add('ja-kanji-ratio', doc, s.title, f'漢字の割合 {kanji / chars:.0%}（{cfg["ja_max_kanji_ratio"]:.0%}'
                          '以下が目安）。ひらがなを増やしてください。')
         self._denominators(doc)
+        sc = readability.ja_score(readability.join_units([CITE.sub('', u) for u in doc.units], 'ja'))
+        if sc is None:
+            self.scores.append((doc.path, 'ja', {'note': 'jReadability skipped: pip install fugashi unidic-lite'}))
+            return
+        self.scores.append((doc.path, 'ja', sc))
+        lim = cfg.get('ja_min_jread')
+        if lim is not None and sc['jread'] < lim:
+            self.add('ja-jread', doc, '(whole file)', f'jReadability {sc["jread"]}（{sc["level"]}）: {lim}より低い'
+                     '（高いほど読みやすい）。文を短くし、漢語を和語に言いかえてください。')
 
 
 WORDS = {w: str(i) for i, w in enumerate('two three four five six seven eight nine ten'.split(), 2)}

@@ -13,7 +13,9 @@ The checks are a first filter, not proof of quality. The NHS advises against rel
 
 | Rule | English | Japanese | Default |
 | --- | --- | --- | --- |
-| Reading level | Flesch-Kincaid grade per section ≤ 6 | | error |
+| Reading level | Flesch-Kincaid grade per section ≤ 6 (main measure); SMOG grade ≤ 6 for the whole file | | error |
+| Reading ease | Flesch Reading Ease ≥ 70 | jReadability ≥ 3.5 (lower intermediate or easier) | warning |
+| Other scores | Gunning Fog, Coleman-Liau, ARI (`pitk check --scores`) | | report only |
 | Sentence length | ≤ 20 words | ≤ 50 characters | warning |
 | Kanji | | only the 1,026 grade 1-6 kanji (MEXT 2020), or the 2,136 jouyou kanji | error |
 | Kanji share | | ≤ 35% of characters per section | warning |
@@ -37,7 +39,7 @@ Every threshold and severity can be changed per project.
 /plugin install patient-education-toolkit@patient-education-toolkit
 ```
 
-The hook needs Python 3.9+ with `beautifulsoup4` and `textstat==0.7.3` (`pip install -r requirements.txt`). textstat is pinned because newer versions need an extra dictionary download.
+The hook needs Python 3.9+ with `beautifulsoup4` and `textstat==0.7.3` (`pip install -r requirements.txt`). textstat is pinned because newer versions need an extra dictionary download. The Japanese readability score also needs `fugashi` and `unidic-lite` (`pip install fugashi unidic-lite`). Without them it is skipped.
 
 **Or as a command-line tool only:**
 
@@ -67,7 +69,7 @@ Files can be HTML, Markdown or plain text. `"lang": "auto"` checks each paragrap
 ## Use
 
 - Ask Claude: "Review leaflet/en/index.html for patients" (uses the `patient-info-review` skill), or name a skill: "Score this with PEMAT", "Rewrite this in やさしい日本語".
-- Command line: `pitk check` (all configured files) or `pitk check file.html --json`. Exit code 1 if there are errors, so it can run in CI.
+- Command line: `pitk check` (all configured files) or `pitk check file.html --json`. Add `--scores` to print every readability score. Exit code 1 if there are errors, so it can run in CI.
 
 ## Skills
 

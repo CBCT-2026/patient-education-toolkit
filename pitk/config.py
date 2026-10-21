@@ -18,7 +18,14 @@ DEFAULTS = {
     'address_reader': 'you',
     # Japanese: "omit" (no check; natural Japanese leaves the subject out), "neutral" (flag あなた).
     'ja_address_reader': 'omit',
+    # Readability (docs/guidelines.md, "Readability formulas"). FKGL per section; SMOG and Flesch Reading Ease on the
+    # whole file. Gunning Fog, Coleman-Liau and ARI are reported only (pitk check --scores).
     'en_max_fkgl': 6,
+    'en_max_smog': 6,
+    'en_min_fre': 70,
+    # jReadability (Japanese, higher = easier): warn below this. 3.5 = lower intermediate (中級前半) or easier.
+    # Needs fugashi + unidic-lite; skipped if they are not installed.
+    'ja_min_jread': 3.5,
     'en_max_sentence_words': 20,
     'ja_max_sentence_chars': 50,
     # "kyouiku" (grade 1-6 kanji, MEXT 2020), "jouyou" (2,136 jouyou kanji) or null (no check).
@@ -35,7 +42,7 @@ DEFAULTS = {
 }
 
 SEVERITY = {
-    'en-fkgl': 'error', 'en-sentence-length': 'warn', 'jargon': 'error', 'passive-voice': 'warn',
+    'en-fkgl': 'error', 'en-smog': 'error', 'en-fre': 'warn', 'ja-jread': 'warn', 'en-sentence-length': 'warn', 'jargon': 'error', 'passive-voice': 'warn',
     'percent': 'warn', 'mixed-denominators': 'warn', 'verbal-risk': 'warn', 'relative-risk': 'warn',
     'address-you': 'warn', 'address-neutral': 'error', 'acronym': 'warn', 'all-caps': 'warn',
     'double-negative': 'warn', 'ja-kanji': 'error', 'ja-sentence-length': 'warn', 'ja-kanji-ratio': 'warn',

@@ -19,5 +19,33 @@ Each rule in the toolkit comes from one of these sources. Checked 2026-10-21. Re
 ## Where the guidance disagrees
 
 - **Visual aids for risk.** IPDAS supports icon arrays; the NHS numbers page says the evidence is not yet strong enough to recommend visual aids for statistics. The toolkit does not require them. The `risk-communication` skill asks the author to decide and record why.
-- **Reading formulas.** FKGL (English) and sentence length (Japanese) are rough. NHS warns against relying on readability tools. Use the hook as a first filter, then the review skills, then test with real readers.
+- **Reading formulas.** All the formulas below are rough. NHS warns against relying on readability tools, and the formulas also disagree with each other (SMOG usually gives a grade 1 to 3 higher than FKGL for the same text). Use the hook as a first filter, then the review skills, then test with real readers.
 - **"You" in Japanese.** English guidance says to address the reader as "you". Natural Japanese usually leaves the subject out; overusing あなた sounds cold or odd. The default for Japanese is therefore `ja_address_reader: "omit"` (no check).
+
+## Readability formulas
+
+`pitk check --scores` prints every score. FKGL is the main English measure. SMOG is a second gate, and Flesch Reading Ease gives a warning. The other scores are reported only. Each threshold is a setting in `.patient-info.json`.
+
+| Formula | Source | What it counts | Used as | Default |
+| --- | --- | --- | --- | --- |
+| Flesch-Kincaid grade level (FKGL) | Kincaid JP, Fishburne RP, Rogers RL, Chissom BS. *Derivation of new readability formulas for Navy enlisted personnel.* Research Branch Report 8-75, Naval Technical Training Command, 1975 | words per sentence, syllables per word | **main measure**, per section, rule `en-fkgl` | error above 6 (`en_max_fkgl`) |
+| SMOG grade | McLaughlin GH. SMOG grading: a new readability formula. *Journal of Reading* 1969;12(8):639-646 | words of 3 or more syllables per sentence | gate, whole file, rule `en-smog` | error above 6 (`en_max_smog`) |
+| Flesch Reading Ease (FRE) | Flesch R. A new readability yardstick. *Journal of Applied Psychology* 1948;32(3):221-233 | the same as FKGL, on a 0-100 scale where higher is easier (70-80 "fairly easy", 60-70 "standard") | warning, whole file, rule `en-fre` | warning below 70 (`en_min_fre`) |
+| Gunning Fog index | Gunning R. *The Technique of Clear Writing.* McGraw-Hill, 1952 | words per sentence, share of words with 3 or more syllables | report only | none |
+| Coleman-Liau index | Coleman M, Liau TL. A computer readability formula designed for machine scoring. *Journal of Applied Psychology* 1975;60(2):283-284 | letters and sentences per 100 words (no syllables) | report only | none |
+| Automated Readability Index (ARI) | Smith EA, Senter RJ. *Automated Readability Index.* AMRL-TR-66-220, Aerospace Medical Research Laboratories, Wright-Patterson AFB, 1967 | characters per word, words per sentence | report only | none |
+| jReadability (Japanese) | 李在鎬 (Lee Jae-ho). 日本語教育のための文章難易度に関する研究. 『早稲田日本語教育学』21, 2016 ([PDF](https://waseda.repo.nii.ac.jp/record/35923/files/WasedaNihongoKyoikugaku_21_Lee.pdf)); Hasebe Y, Lee J-H. Introducing a readability evaluation system for Japanese language education. CASTEL/J 2015 ([slides](https://www.yohasebe.com/assets/docs/Hasebe_Lee_2015_CASTELJ.pdf)); online system [jreadability.net](https://jreadability.net) | 11.724 − 0.056 × mean sentence length (words) − 0.126 × % kango − 0.042 × % wago − 0.145 × % verbs − 0.044 × % particles | warning, whole file, rule `ja-jread` | warning below 3.5 (`ja_min_jread`) |
+
+The English scores come from `textstat` 0.7.3. Scores are worked out on the whole file, except FKGL, which is per section so that one hard section cannot hide behind easy ones. Headings and list items count as sentences.
+
+jReadability levels (Hasebe & Lee 2015; higher is easier): 5.5-6.4 初級前半 lower elementary, 4.5-5.4 初級後半 upper elementary, 3.5-4.4 中級前半 lower intermediate, 2.5-3.4 中級後半 upper intermediate, 1.5-2.4 上級前半 lower advanced, 0.5-1.4 上級後半 upper advanced. The default warning at 3.5 means "lower intermediate or easier".
+
+### Limits
+
+- **All formulas** measure only word and sentence length (and, for Japanese, word types). They ignore layout, pictures, order, tone and whether the reader knows the topic. A short, wrong or confusing text can still score well.
+- **Short texts** give unstable scores. SMOG was built on samples of 30 sentences: below 3 sentences the toolkit does not report it. For a leaflet shorter than 30 sentences, treat SMOG as a rough guide.
+- **Formulas disagree.** SMOG predicts the grade for full understanding, so it is usually 1 to 3 grades higher than FKGL for the same text. Reports in health literacy often prefer SMOG for health information for this reason (for example Wang LW et al. *Res Social Adm Pharm* 2013;9(5):503-516). FKGL stays the main measure here, because the NHS reading age (9 to 11) maps most directly onto it.
+- **Syllable counting** in textstat uses a hyphenation dictionary, so it can be off by one for some words, and numbers count as one short word.
+- **Medical words** such as "nerve" or "jaw" are short and score as easy. Long but familiar words such as "information" score as hard.
+- **jReadability** was built on Japanese textbooks for learners of Japanese, so it measures difficulty for learners rather than for native readers. It depends on the word splitting of the morphological analyser (UniDic, via `fugashi` and `unidic-lite`), so scores can differ a little from the jreadability.net web system. The counting follows the open-source [jreadability](https://github.com/joshdavham/jreadability) package (MIT licence): punctuation counts as a word, and verbs exclude 非自立可能 forms (the あり of あります). The tests check the score against that package. Without `fugashi` and `unidic-lite` the score is skipped and the report says so.
+- **Obi-2** (Sato S, Matsuyoshi S, Kondoh Y. Automatic assessment of Japanese text readability based on a textbook corpus. LREC 2008) is not included. It needs the authors' trained model, which is only available through their web service, so it cannot run offline.
