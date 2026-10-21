@@ -78,6 +78,7 @@ Files can be HTML, Markdown or plain text. `"lang": "auto"` checks each paragrap
 | `patient-info-review` | Runs the checker, then the right reviews, then a table of suggested edits; PIF TICK process check |
 | `pemat-review` | PEMAT-P / PEMAT-A/V scoring (understandability, actionability) |
 | `clear-communication-index` | CDC Clear Communication Index (target 90+) |
+| `dental-consent-content` | What dental and oral surgery materials should cover: material risks with numbers, alternatives including no treatment, risks of waiting, risk factors, next step (RCS 2020, ADA 2020, JP 2019) |
 | `risk-communication` | Natural frequencies, same denominator, absolute risk, uncertainty (IPDAS, NHS) |
 | `plain-language-rewrite` | English rewrite: you, active voice, ≤ 20 words, plain word first (NHS, ISO 24495-1) |
 | `yasashii-nihongo` | Japanese rewrite in やさしい日本語 with a kanji limit |

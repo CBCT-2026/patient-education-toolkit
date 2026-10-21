@@ -30,6 +30,7 @@ Before scoring, write down the CDC open questions: primary audience, what is kno
 - `plain-language-rewrite`: English wording and structure.
 - `yasashii-nihongo`: Japanese wording.
 - `cross-format-consistency`: when the same content exists in more than one format or language.
+- `dental-consent-content`: when the material is about a dental or oral surgery procedure.
 
 ## 3. PIF TICK process check (report only)
 

@@ -16,6 +16,18 @@ Each rule in the toolkit comes from one of these sources. Checked 2026-10-21. Re
 | 出入国在留管理庁・文化庁「在留支援のためのやさしい日本語ガイドライン」(2020) | 1文1情報; 文を短く; 二重否定を避ける; 敬語は「です・ます」まで; カタカナ語・オノマトペを避ける; 専門用語は説明を付ける; イラスト・写真を使う | hook `ja-sentence-length`, `ja-keigo`, `double-negative`, `jargon`; skill `yasashii-nihongo` |
 | 文部科学省「学年別漢字配当表」(2020) | 1,026 kanji taught in grades 1-6 | hook `ja-kanji` (data/kyouiku_kanji_2020.txt) |
 
+## Dentistry
+
+No dental body publishes guidance on *how to write* patient materials. The dental sources below cover *what to tell patients* for consent, and are used by the `dental-consent-content` skill.
+
+| Source | What the toolkit takes from it | Where |
+| --- | --- | --- |
+| RCS England, Faculty of Dental Surgery. [Parameters of care for patients undergoing mandibular third molar surgery](https://www.rcseng.ac.uk/-/media/Files/RCS/FDS/3rd-molar-guidelines--April-2021-v3.pdf) (2020) | Material risks (nerve injury, dry socket and others), alternatives including coronectomy, risks of deferring or declining, age and nerve proximity as risk factors; written information recommended | skill `dental-consent-content` items 3-7 |
+| Australian Dental Association. [Guidelines for Consent for Care in Dentistry](https://adanstaging.ada.org.au/getmedia/50907ede-4a19-4530-b864-71732fc557e9/ADA_Guidelines_Consent-for-care.pdf) (2020) | Plain non-technical language; disclose material risks, naming nerve damage in oral surgery; written information alone is not enough, so check understanding | skill `dental-consent-content` items 2, 3, 9 |
+| 日本歯科麻酔学会ほか. [歯科治療による下歯槽神経・舌神経損傷の診断とその治療に関するガイドライン](https://minds.jcqhc.or.jp/?p=1745) (2019) | Japanese clinical guideline on inferior alveolar and lingual nerve injury: what the injury is and how it is managed | skill `dental-consent-content` items 3, 4 |
+| Lewis MA, Newton JT. [An evaluation of the quality of commercially produced patient information leaflets](https://www.nature.com/articles/4813828). *Br Dent J* 2006;201:114-117 | Aim stated first, patient-centred, option of no treatment, sources and dates | skill `dental-consent-content` items 1, 5, 10 |
+| Montgomery v Lanarkshire Health Board [2015] UKSC 11 | What counts as a material risk | skill `dental-consent-content` |
+
 ## Where the guidance disagrees
 
 - **Visual aids for risk.** IPDAS supports icon arrays; the NHS numbers page says the evidence is not yet strong enough to recommend visual aids for statistics. The toolkit does not require them. The `risk-communication` skill asks the author to decide and record why.
