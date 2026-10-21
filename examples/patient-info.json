@@ -1,0 +1,21 @@
+{
+  "files": [
+    { "glob": "leaflet/en/*.html", "lang": "en" },
+    { "glob": "leaflet/ja/*.html", "lang": "ja" },
+    { "glob": "scripts/*.md", "lang": "auto" }
+  ],
+  "pairs": [["leaflet/en/index.html", "leaflet/ja/index.html"]],
+  "ignore_selectors": ["sup.cite", ".references", ".credit"],
+  "ignore_sections": ["^References$", "^Sources$", "^参考文献$"],
+  "address_reader": "you",
+  "ja_address_reader": "omit",
+  "en_max_fkgl": 6,
+  "en_max_sentence_words": 20,
+  "ja_max_sentence_chars": 50,
+  "ja_kanji": "kyouiku",
+  "ja_max_kanji_ratio": 0.35,
+  "jargon_allow": ["CT"],
+  "jargon_extra": { "en": { "dry socket": "painful empty tooth socket (explain once)" }, "ja": {} },
+  "require": { "date written": "Written|Published|作成日", "contact": "Contact|問い合わせ" },
+  "severity": { "passive-voice": "warn", "acronym": "off" }
+}

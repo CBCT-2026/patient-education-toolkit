@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patient-info-toolkit"
+version = "0.1.0"
+description = "Deterministic checks for patient information documents in English and Japanese, with Claude Code skills and hooks."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = ["beautifulsoup4>=4.9", "textstat==0.7.3"]
+
+[project.scripts]
+pitk = "pitk.cli:main"
+
+[tool.setuptools]
+packages = ["pitk"]
+
+[tool.setuptools.package-data]
+pitk = ["data/*"]
