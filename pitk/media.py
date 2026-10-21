@@ -232,7 +232,7 @@ CVD = {
 def simulate(path, out_dir=None):
     """Write <name>-cvd.png: the original and the 3 simulations side by side, each labelled."""
     import numpy as np
-    from PIL import Image, ImageDraw
+    from PIL import Image, ImageDraw, ImageFont
     im = Image.open(path).convert('RGB')
     a = np.asarray(im).astype(float) / 255
     lin = np.where(a <= 0.04045, a / 12.92, ((a + 0.055) / 1.055) ** 2.4)
@@ -242,12 +242,16 @@ def simulate(path, out_dir=None):
         srgb = np.where(s <= 0.0031308, s * 12.92, 1.055 * s ** (1 / 2.4) - 0.055)
         tiles.append((name, Image.fromarray((srgb * 255).round().astype('uint8'))))
     w, h = im.size
-    pad = 40
+    pad = max(40, h // 16)
+    try:
+        font = ImageFont.load_default(size=pad * 3 // 5)
+    except TypeError:  # Pillow before 10.1
+        font = ImageFont.load_default()
     sheet = Image.new('RGB', (w * 2, (h + pad) * 2), 'white')
     for i, (name, t) in enumerate(tiles):
         x, y = (i % 2) * w, (i // 2) * (h + pad)
         sheet.paste(t, (x, y + pad))
-        ImageDraw.Draw(sheet).text((x + 10, y + 10), name, fill='black')
+        ImageDraw.Draw(sheet).text((x + 10, y + pad // 6), name, fill='black', font=font)
     out = Path(out_dir or Path(path).parent) / (Path(path).stem + '-cvd.png')
     sheet.save(out)
     return out

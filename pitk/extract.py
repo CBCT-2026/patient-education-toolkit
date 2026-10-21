@@ -7,7 +7,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-BLOCKS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'td', 'th', 'dt', 'dd', 'figcaption', 'caption', 'blockquote']
+BLOCKS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'li', 'td', 'th', 'dt', 'dd', 'figcaption', 'caption', 'blockquote',
+          'div']  # a div counts only when it holds no other block (e.g. a risk box of inline text)
 CONTAINERS = ['p', 'li', 'ul', 'ol', 'table', 'figcaption', 'dl', 'blockquote', 'div', 'section']
 
 
