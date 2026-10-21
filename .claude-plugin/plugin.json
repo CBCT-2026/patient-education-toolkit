@@ -1,6 +1,6 @@
 {
   "name": "patient-education-toolkit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Skills and deterministic hooks for writing patient information in English and Japanese (NHS, PEMAT, CDC Clear Communication Index, IPDAS, やさしい日本語).",
   "author": { "name": "Markus Seifert" },
   "homepage": "https://github.com/CBCT-2026/patient-education-toolkit",

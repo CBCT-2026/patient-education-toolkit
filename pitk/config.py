@@ -37,6 +37,21 @@ DEFAULTS = {
     'jargon_extra': {'en': {}, 'ja': {}},
     # Text that must appear somewhere in each file (PIF TICK basics): {"date": "Published|作成日"}
     'require': {},
+    # Claim map: every risk number in the files must be listed here, with the sources that support it.
+    # [{"value": "7 in 100", "also": ["100人中約7人"], "cite": ["rico", "derbishi"], "note": "high-risk teeth"}]
+    'claims': [],
+    # Text colours to check for contrast (WCAG 2.2: 4.5 normal text, 3 large text). Add "large" for large or bold text:
+    # [["#E46C0A", "#FFFFFF", "video name"], ["#1F7FB8", "#FFFFFF", "heading", "large"]]
+    'colour_pairs': [],
+    # Spoken scripts: estimated length must fit. [{"glob": "script.md", "max_seconds": 45, "sections": "^English$"}]
+    'spoken': [],
+    'en_words_per_minute': 150,
+    'ja_chars_per_second': 5.5,
+    # Subtitle files (.vtt, .srt): [{"glob": "video/en/*.vtt", "lang": "en"}]
+    'subtitles': [],
+    # Label sets that must use the same names, e.g. on-screen video labels vs web page labels:
+    # [{"file": "video/script-en.json", "json": "labels"}, {"file": "en/index.html", "selector": ".label"}]
+    'label_sets': [],
     # Per-rule severity: "error" (blocks in the hook), "warn" or "off".
     'severity': {},
 }
@@ -47,6 +62,9 @@ SEVERITY = {
     'address-you': 'warn', 'address-neutral': 'error', 'acronym': 'warn', 'all-caps': 'warn',
     'double-negative': 'warn', 'ja-kanji': 'error', 'ja-sentence-length': 'warn', 'ja-kanji-ratio': 'warn',
     'ja-keigo': 'warn', 'img-alt': 'error', 'link-text': 'warn', 'require': 'warn',
+    'claim-unknown': 'error', 'claim-uncited': 'warn', 'img-alt-quality': 'warn', 'contrast': 'error',
+    'spoken-length': 'error', 'sub-line-length': 'warn', 'sub-reading-speed': 'warn', 'sub-duration': 'warn',
+    'labels-differ': 'warn',
     'pair-numbers': 'error', 'pair-sections': 'error', 'pair-images': 'error',
 }
 

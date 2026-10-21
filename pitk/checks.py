@@ -51,6 +51,37 @@ CITE = re.compile(r'\[\d+(?:\s*[,–-]\s*\d+)*\]|\[\[[\w:.-]+\]\]|\{\{[^}]*\}\}'
 DEFINED = re.compile(r'((medical|other|full|proper|technical) name (is|for)|called|known as|means)\s+(the\s+|an?\s+)?([\w-]+\s+){0,3}$', re.I)
 
 
+# Risk numbers, normalised to "a in N", "a-b in N" or "x%" so they can be matched against the claim map.
+RISK_EN = re.compile(r'\b(\d+)(?:\s*(?:to|-|–)\s*(\d+))?\s+(?:in|out of)\s+(\d[\d,]*)\b')
+RISK_JA = re.compile(r'(\d[\d,]*)\s*人(?:中|に|のうち)\s*(?:約|およそ)?\s*(\d+)(?:\s*[〜~～から-]\s*(\d+))?\s*人')
+RISK_PCT = re.compile(r'(\d+(?:\.\d+)?)\s?(?:%|％|percent|per cent|パーセント)')
+CITE_KEY = re.compile(r'\[\[([\w:.-]+)\]\]')
+
+
+def risk_numbers(u):
+    """(normalised value, start, end) for every risk number in a text unit."""
+    t = unicodedata.normalize('NFKC', u)
+    out = []
+    for m in RISK_EN.finditer(t):
+        a = m.group(1) + (f'-{m.group(2)}' if m.group(2) else '')
+        out.append((f'{a} in {m.group(3).replace(",", "")}', m.start(), m.end()))
+    for m in RISK_JA.finditer(t):
+        a = m.group(2) + (f'-{m.group(3)}' if m.group(3) else '')
+        out.append((f'{a} in {m.group(1).replace(",", "")}', m.start(), m.end()))
+    for m in RISK_PCT.finditer(t):
+        out.append((f'{m.group(1)}%', m.start(), m.end()))
+    return out
+
+
+def norm_claim(v):
+    found = risk_numbers(v)
+    return found[0][0] if found else v.strip()
+
+
+ALT_GENERIC = re.compile(r'^(image|picture|photo|photograph|figure|fig|graphic|icon|diagram|img|画像|写真|図|イラスト)\s*\d*\.?$', re.I)
+ALT_PREFIX = re.compile(r'^(an? )?(image|picture|photo|graphic) of\b|の(画像|写真)です?。?$', re.I)
+
+
 def _explained(u, m):
     before, after = u[:m.start()], u[m.end():]
     for o, c in (('(', ')'), ('（', '）'), ('「', '」')):
@@ -76,6 +107,16 @@ class Checker:
         for src, alt in doc.images:
             if alt is None:
                 self.add('img-alt', doc, '(images)', f'Image has no alt text: {src}')
+            elif alt.strip():
+                a = alt.strip()
+                if re.search(r'\.(png|jpe?g|gif|svg|webp)$', a, re.I) or ALT_GENERIC.match(a):
+                    self.add('img-alt-quality', doc, '(images)', f'Alt text "{a}" does not say what the picture shows: {src}')
+                elif ALT_PREFIX.search(a):
+                    self.add('img-alt-quality', doc, '(images)', f'Alt text starts with "image of" or similar; screen readers '
+                             f'already say it is an image: "{a}"')
+                elif len(a) > 150:
+                    self.add('img-alt-quality', doc, '(images)', f'Alt text is {len(a)} characters (aim for 150 or fewer; '
+                             f'put long descriptions in the text): {src}')
         bad = {'click here', 'here', 'more', 'read more', 'link', 'this link', 'こちら', 'ここ', 'こちらをクリック'}
         for t in doc.links:
             if t.strip().lower() in bad:
@@ -85,6 +126,7 @@ class Checker:
         for label, rx in req.items():
             if not re.search(rx, raw):
                 self.add('require', doc, '(whole file)', f'Missing: {label} (pattern {rx}).')
+        self._claims(doc)
         jar = _jargon(lang, self.cfg)
         for s in doc.sections:
             for u in s.units:
@@ -102,6 +144,29 @@ class Checker:
                 for m in re.finditer(r'\d+(?:\.\d+)?\s?(%|％|percent|per cent|パーセント)', u):
                     self.add('percent', doc, s.title, 'Percentage: give risk as "X in 100" (natural frequency).',
                              _cut(u, m.start(), m.end()))
+
+    def _claims(self, doc):
+        """Every risk number must be in the project's claim map ("claims" in .patient-info.json), and where the file
+        uses [[key]] citations, the sentence must cite at least one of the sources listed for that claim."""
+        claims = self.cfg.get('claims')
+        if not claims:
+            return
+        known = {}
+        for c in claims:
+            for v in [c['value'], *c.get('also', [])]:
+                known[norm_claim(v)] = c
+        cites = any(CITE_KEY.search(u) for u in doc.units)
+        for s in doc.sections:
+            for u in s.units:
+                keys = set(CITE_KEY.findall(u))
+                for val, a, b in risk_numbers(u):
+                    c = known.get(val)
+                    if c is None:
+                        self.add('claim-unknown', doc, s.title, f'Risk number "{val}" is not in the claim map ("claims" in '
+                                 '.patient-info.json). Check it against its source, then add it.', _cut(u, a, b))
+                    elif cites and c.get('cite') and not keys & set(c['cite']):
+                        self.add('claim-uncited', doc, s.title, f'"{val}" should cite one of: {", ".join(c["cite"])}.',
+                                 _cut(u, a, b))
 
     # ---------- English ----------
     def english(self, doc):

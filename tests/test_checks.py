@@ -2,7 +2,7 @@
 import unittest
 from pathlib import Path
 
-from pitk import checks, cli, config, readability
+from pitk import checks, cli, config, media, readability, scoring
 
 FIX = Path(__file__).parent / 'fixtures'
 
@@ -95,6 +95,85 @@ class TestReadability(unittest.TestCase):
         scores = []
         cli.check_file(FIX / 'leaflet-en.html', 'en', self.cfg, scores)
         self.assertIn('Flesch Reading Ease', cli.score_table(scores, None))
+
+
+class TestNewChecks(unittest.TestCase):
+    def setUp(self):
+        self.cfg = config.load(None)
+
+    def test_claims(self):
+        cfg = dict(self.cfg, claims=[{'value': '7 in 100', 'also': ['100人中約7人'], 'cite': ['rico']}])
+        ck = checks.Checker(cfg)
+        ck._claims(cli.extract.from_markdown('x.md', 'About 7 in 100 get it.[[rico]] About 9 in 100 do.[[rico]]\n\n'
+                                                    'About 7 in 100 again.[[other]]'))
+        msgs = [(f.rule, f.excerpt) for f in ck.out]
+        self.assertTrue(any(r == 'claim-unknown' and '9 in 100' in e for r, e in msgs))
+        self.assertTrue(any(r == 'claim-uncited' and 'again' in e for r, e in msgs))
+        self.assertEqual(len(msgs), 2)
+        self.assertEqual([v for v, _, _ in checks.risk_numbers('100人中約7人が')], ['7 in 100'])
+        self.assertEqual([v for v, _, _ in checks.risk_numbers('About 1 to 3 in 1,000 people')], ['1-3 in 1000'])
+
+    def test_alt_quality(self):
+        doc = cli.extract.from_html('x.html', '<p>Hi there.</p><img src="a.png" alt="image"><img src="b.png" alt="b.png">'
+                                    '<img src="c.png" alt="Picture of a tooth"><img src="d.png" alt="A tooth with long roots.">')
+        ck = checks.Checker(self.cfg)
+        ck.common(doc, 'en')
+        self.assertEqual(sum(f.rule == 'img-alt-quality' for f in ck.out), 3)
+
+    def test_contrast(self):
+        self.assertAlmostEqual(media.contrast((0, 0, 0), (255, 255, 255)), 21.0, places=1)
+        cfg = dict(self.cfg, colour_pairs=[['#E46C0A', '#FFFFFF', 'orange'], ['#E46C0A', '#FFFFFF', 'orange', 'large']])
+        self.assertEqual(len(media.check_colour_pairs(cfg, 'x')), 1)
+        rows = media.css_pairs(':root{--fg:#777}.a{color:var(--fg);background:#fff}.b{color:#000}')
+        self.assertEqual(rows, [('.a', '#777', '#fff')])
+
+    def test_subtitles_and_spoken(self):
+        import tempfile, os
+        d = tempfile.mkdtemp()
+        vtt = os.path.join(d, 'v.vtt')
+        Path(vtt).write_text('WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nThis line is far too long for one subtitle line, '
+                             'really it is.\n', encoding='utf-8')
+        cfg = dict(self.cfg, subtitles=[{'glob': '*.vtt', 'lang': 'en'}])
+        rules_found = rules(media.check_subtitles(d, vtt, cfg))
+        self.assertTrue({'sub-line-length', 'sub-reading-speed'} <= rules_found)
+        self.assertAlmostEqual(media.spoken_seconds(' '.join(['word'] * 150), 'en', self.cfg), 60)
+
+    def test_labels(self):
+        import tempfile, os, json
+        d = tempfile.mkdtemp()
+        Path(d, 'a.html').write_text('<span class="label">Jaw nerve<small>inferior alveolar nerve</small></span>'
+                                     '<span class="label">Roots</span>', encoding='utf-8')
+        Path(d, 'b.json').write_text(json.dumps({'labels': {'n': ['Jaw nerve', 'x'], 't': ['Tooth', '']}}), encoding='utf-8')
+        cfg = dict(self.cfg, label_sets=[{'file': 'a.html', 'selector': '.label'}, {'file': 'b.json', 'json': 'labels'}])
+        out = media.check_labels(d, None, cfg)
+        self.assertEqual(len(out), 1)
+        self.assertIn('roots', out[0].message)
+
+    def test_cvd(self):
+        try:
+            from PIL import Image
+            import numpy  # noqa: F401
+        except ImportError:
+            self.skipTest('Pillow/numpy not installed')
+        import tempfile, os
+        d = tempfile.mkdtemp()
+        p = os.path.join(d, 'red.png')
+        Image.new('RGB', (20, 10), (200, 30, 30)).save(p)
+        out = media.simulate(p)
+        self.assertTrue(out.exists())
+
+    def test_panel_and_agree(self):
+        readers = [{'persona': f'r{i}', 'answers': {'q1': {'found': True, 'understood': i < 17},
+                                                     'q2': {'found': i < 10, 'understood': True}}} for i in range(20)]
+        res = scoring.panel({'questions': [{'id': 'q1'}, {'id': 'q2'}], 'readers': readers})
+        self.assertEqual([q['pass'] for q in res['questions']], [True, False])
+        runs = [{'instrument': 'PEMAT-P', 'sections': {'u': {'1': 'agree', '2': 'disagree', '3': 'na'}}},
+                {'instrument': 'PEMAT-P', 'sections': {'u': {'1': 'agree', '2': 'agree', '3': 'na'}}},
+                {'instrument': 'PEMAT-P', 'sections': {'u': {'1': 'agree', '2': 'disagree', '3': 'na'}}}]
+        s = scoring.agree(runs)['sections']['u']
+        self.assertEqual(s['scores'], [50.0, 100.0, 50.0])
+        self.assertAlmostEqual(s['unanimous_share'], 0.67)
+        self.assertIn('2', s['disputed'])
 
 
 if __name__ == '__main__':

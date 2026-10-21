@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "patient-education-toolkit"
-version = "0.2.0"
+version = "0.3.0"
 description = "Deterministic checks for patient information documents in English and Japanese, with Claude Code skills and hooks."
 readme = "README.md"
 license = { text = "MIT" }
@@ -13,6 +13,7 @@ dependencies = ["beautifulsoup4>=4.9", "textstat==0.7.3"]
 
 [project.optional-dependencies]
 ja = ["fugashi>=1.1", "unidic-lite>=1.0.8"]
+images = ["numpy", "Pillow"]
 
 [project.scripts]
 pitk = "pitk.cli:main"

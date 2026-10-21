@@ -28,6 +28,19 @@ No dental body publishes guidance on *how to write* patient materials. The denta
 | Lewis MA, Newton JT. [An evaluation of the quality of commercially produced patient information leaflets](https://www.nature.com/articles/4813828). *Br Dent J* 2006;201:114-117 | Aim stated first, patient-centred, option of no treatment, sources and dates | skill `dental-consent-content` items 1, 5, 10 |
 | Montgomery v Lanarkshire Health Board [2015] UKSC 11 | What counts as a material risk | skill `dental-consent-content` |
 
+## Video, narration, colour and AI scoring
+
+| Source | What the toolkit takes from it | Where |
+| --- | --- | --- |
+| Netflix Timed Text Style Guides: [General requirements](https://backlothelp.netflix.com/hc/en-us/articles/215758617), [English (USA)](https://backlothelp.netflix.com/hc/en-us/articles/217350977) and [Japanese](https://backlothelp.netflix.com/hc/en-us/articles/215767517) | English: 42 characters a line, 2 lines, 20 characters a second (adult); Japanese: 16 characters a line, 4 characters a second; 5/6 s to 7 s on screen | hook `sub-line-length`, `sub-reading-speed`, `sub-duration` |
+| BBC [Subtitle guidelines](https://www.bbc.co.uk/accessibility/forproducts/guides/subtitles/) | About 160 to 180 words a minute for subtitles; break lines at natural points | skill guidance; the default speaking rate (150 words a minute) is a little slower for health content |
+| W3C [WCAG 2.2](https://www.w3.org/TR/WCAG22/), 1.4.3 Contrast (Minimum) and 1.1.1 Non-text Content | Contrast 4.5:1 for text, 3:1 for large text (24 px, or 18.7 px bold); alt text that serves the same purpose as the image | hook `contrast`, `img-alt`, `img-alt-quality`; `pitk contrast` |
+| Machado GM, Oliveira MM, Fernandes LAF. A physiologically-based model for simulation of color vision deficiency. *IEEE Trans Vis Comput Graph* 2009;15(6):1291-1298 | Matrices for protanopia, deuteranopia and tritanopia (severity 1.0) | `pitk cvd` |
+| MHRA. [Best practice guidance on patient information leaflets](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/946602/Best_practice_guidance_on_patient_information_leaflets.pdf) | User testing: 2 rounds of 10 readers; each key message found and understood by 16 of 20 | skill `ai-reader-panel` (simulated), `pitk panel` |
+| Fleiss JL. Measuring nominal scale agreement among many raters. *Psychol Bull* 1971;76(5):378-382 | Agreement between repeated scorings | skill `scoring-reliability`, `pitk agree` |
+
+Limits: spoken length is an estimate (measure the recording); the subtitle limits are industry style rules, not health-literacy evidence; simulated readers and repeated AI scoring have **not** been validated against real readers or expert raters, so report them as pre-tests.
+
 ## Where the guidance disagrees
 
 - **Visual aids for risk.** IPDAS supports icon arrays; the NHS numbers page says the evidence is not yet strong enough to recommend visual aids for statistics. The toolkit does not require them. The `risk-communication` skill asks the author to decide and record why.

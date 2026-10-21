@@ -25,6 +25,12 @@ The checks are a first filter, not proof of quality. The NHS advises against rel
 | Risk numbers | percentages, mixed denominators ("in 100" and "in 1,000"), "rare"/"common" without a number, relative risk without absolute | same | warning |
 | Undefined acronyms, capitals for emphasis, double negatives | ✓ | 二重否定, 敬語 (いただく, ございます) | warning |
 | Images without alt text, "click here" links | ✓ | ✓ | error / warning |
+| Risk numbers against sources | every "X in N" / % must be in the project's claim map and cite one of its sources | same (100人中X人) | error / warning |
+| Alt text quality | file names, "image", "picture of …", over 150 characters | same | warning |
+| Spoken scripts | estimated length (150 words a minute) against a time limit | 5.5 characters a second | error |
+| Subtitles (.vtt, .srt) | ≤ 42 characters a line, ≤ 2 lines, ≤ 20 characters a second, 0.83-7 s on screen | ≤ 16 characters a line, ≤ 4 a second | warning |
+| Labels across formats | e.g. video labels and web page labels use the same names | same | warning |
+| Colour contrast | listed text colours meet WCAG 2.2 (4.5:1, or 3:1 for large text) | same | error |
 | Language pairs | same numbers, same number of main headings, same pictures in the same order | | error |
 | Required text | e.g. date written, contact (PIF TICK basics) | | warning |
 
@@ -70,6 +76,9 @@ Files can be HTML, Markdown or plain text. `"lang": "auto"` checks each paragrap
 
 - Ask Claude: "Review leaflet/en/index.html for patients" (uses the `patient-info-review` skill), or name a skill: "Score this with PEMAT", "Rewrite this in やさしい日本語".
 - Command line: `pitk check` (all configured files) or `pitk check file.html --json`. Add `--scores` to print every readability score. Exit code 1 if there are errors, so it can run in CI.
+- `pitk contrast style.css`: contrast of every CSS rule that sets both a text and a background colour.
+- `pitk cvd figure.png`: writes `figure-cvd.png`, the picture as seen with protanopia, deuteranopia and tritanopia (needs `numpy` and `Pillow`).
+- `pitk panel results.json` and `pitk agree run1.json run2.json run3.json`: add up the AI reader panel and repeated scorings (see the skills below).
 
 ## Skills
 
@@ -79,6 +88,8 @@ Files can be HTML, Markdown or plain text. `"lang": "auto"` checks each paragrap
 | `pemat-review` | PEMAT-P / PEMAT-A/V scoring (understandability, actionability) |
 | `clear-communication-index` | CDC Clear Communication Index (target 90+) |
 | `dental-consent-content` | What dental and oral surgery materials should cover: material risks with numbers, alternatives including no treatment, risks of waiting, risk factors, next step (RCS 2020, ADA 2020, JP 2019) |
+| `ai-reader-panel` | Simulated user test: 20 independent AI readers with different backgrounds answer key-message questions, a judge marks them, scored against the MHRA 16-of-20 benchmark. A pre-test only |
+| `scoring-reliability` | PEMAT or CDC scoring run 3+ times independently; mean, SD, item agreement and Fleiss' kappa |
 | `risk-communication` | Natural frequencies, same denominator, absolute risk, uncertainty (IPDAS, NHS) |
 | `plain-language-rewrite` | English rewrite: you, active voice, ≤ 20 words, plain word first (NHS, ISO 24495-1) |
 | `yasashii-nihongo` | Japanese rewrite in やさしい日本語 with a kanji limit |

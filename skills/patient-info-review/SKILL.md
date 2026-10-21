@@ -31,6 +31,8 @@ Before scoring, write down the CDC open questions: primary audience, what is kno
 - `yasashii-nihongo`: Japanese wording.
 - `cross-format-consistency`: when the same content exists in more than one format or language.
 - `dental-consent-content`: when the material is about a dental or oral surgery procedure.
+- `ai-reader-panel`: simulated user test (pre-test only) of the key messages.
+- `scoring-reliability`: when a PEMAT or CDC score will be reported, score it 3 or more times and report agreement.
 
 ## 3. PIF TICK process check (report only)
 
