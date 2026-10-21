@@ -51,8 +51,9 @@ DEFINED = re.compile(r'((medical|other|full|proper|technical) name (is|for)|call
 
 def _explained(u, m):
     before, after = u[:m.start()], u[m.end():]
-    if before.rstrip().endswith(('(', '（', '「')) and after.lstrip()[:1] in (')', '）', '」'):
-        return True
+    for o, c in (('(', ')'), ('（', '）'), ('「', '」')):
+        if before.rfind(o) > before.rfind(c) and c in after:  # inside brackets: an explanation or a name
+            return True
     return bool(DEFINED.search(before[-40:])) or bool(re.match(r'\s*」?\s*(と(言|い)います|と呼びます)', after))
 
 
